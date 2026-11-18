@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRef } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import type { QAMessage } from "@/store/sessions";
 import { MarkdownLite } from "./MarkdownLite";
 import { Chip } from "./ui";
@@ -15,11 +15,15 @@ const SUGGESTIONS = [
 export function ChatView({
   messages,
   streaming,
+  speakingId,
   onSuggestion,
+  onToggleSpeak,
 }: {
   messages: QAMessage[];
   streaming: Record<string, string>;
+  speakingId: string | null;
   onSuggestion: (q: string) => void;
+  onToggleSpeak: (id: string, text: string) => void;
 }) {
   const listRef = useRef<FlatList<QAMessage>>(null);
 
@@ -62,6 +66,8 @@ export function ChatView({
           );
 
         const text = item.pending ? (streaming[item.id] ?? "") : item.content;
+        const speaking = speakingId === item.id;
+        const canSpeak = !item.pending && !item.error && !!text;
         return (
           <View
             className={`mb-3 max-w-[92%] self-start rounded-2xl rounded-bl-md border px-4 py-2.5 ${
@@ -77,6 +83,22 @@ export function ChatView({
             ) : (
               <ActivityIndicator color="#818cf8" />
             )}
+            {canSpeak ? (
+              <Pressable
+                onPress={() => onToggleSpeak(item.id, text)}
+                hitSlop={8}
+                className="mt-1.5 flex-row items-center gap-1 self-start rounded-full py-1 pr-2 active:opacity-60"
+              >
+                <Ionicons
+                  name={speaking ? "stop-circle" : "volume-medium-outline"}
+                  size={16}
+                  color={speaking ? "#f87171" : "#a1a1aa"}
+                />
+                <Text className={`text-xs ${speaking ? "text-red-300" : "text-zinc-400"}`}>
+                  {speaking ? "Stop" : "Read aloud"}
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
         );
       }}

@@ -10,7 +10,9 @@ export function NotesView({
   error,
   updatedAt,
   hasTranscript,
+  speaking,
   onRefresh,
+  onToggleSpeak,
 }: {
   title: string;
   notes: string;
@@ -19,7 +21,9 @@ export function NotesView({
   error: string | null;
   updatedAt?: number;
   hasTranscript: boolean;
+  speaking: boolean;
   onRefresh: () => void;
+  onToggleSpeak: () => void;
 }) {
   const shown = draft ?? notes;
 
@@ -34,6 +38,13 @@ export function NotesView({
           disabled={!hasTranscript}
           onPress={onRefresh}
           className="flex-1"
+        />
+        <Button
+          title={speaking ? "Stop" : "Listen"}
+          icon={speaking ? "stop-circle" : "volume-medium-outline"}
+          variant={speaking ? "danger" : "secondary"}
+          disabled={!notes}
+          onPress={onToggleSpeak}
         />
         <Button
           title="Share"

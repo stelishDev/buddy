@@ -1,13 +1,123 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { Chip, Section, ToggleRow } from "@/components/ui";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Button, Chip, Section, ToggleRow } from "@/components/ui";
 import { KIND_LABEL } from "@/lib/ai/presets";
+import { listVoices, speak, stopSpeaking, useSpeakingId, type VoiceOption } from "@/lib/tts";
 import { useProviders } from "@/store/providers";
 import { useSettings } from "@/store/settings";
 
 const INTERVALS = [30, 60, 120, 300];
 const LANGUAGES = ["en-NZ", "en-AU", "en-GB", "en-US"];
+const RATES = [
+  { label: "Slow", value: 0.85 },
+  { label: "Normal", value: 1 },
+  { label: "Fast", value: 1.15 },
+  { label: "Faster", value: 1.3 },
+];
+const MAX_VOICES_SHOWN = 24;
+const SAMPLE = "Here's a quick summary. The team agreed to ship on Friday, and Sam owns the follow-up email.";
+
+function VoiceSettings() {
+  const settings = useSettings();
+  const speakingId = useSpeakingId();
+  const [voices, setVoices] = useState<VoiceOption[] | null>(null);
+  const [showAll, setShowAll] = useState(false);
+
+  const load = useCallback(() => {
+    setVoices(null);
+    listVoices(settings.language)
+      .then(setVoices)
+      .catch(() => setVoices([]));
+  }, [settings.language]);
+
+  useEffect(load, [load]);
+  useEffect(() => () => void stopSpeaking(), []);
+
+  const testing = speakingId === "voice-test";
+  const test = () =>
+    testing
+      ? stopSpeaking()
+      : speak("voice-test", SAMPLE, { voice: settings.ttsVoice, rate: settings.ttsRate, language: settings.language });
+
+  const shown = voices && !showAll ? voices.slice(0, MAX_VOICES_SHOWN) : voices;
+
+  return (
+    <Section title="Read aloud">
+      <ToggleRow
+        label="Read answers aloud"
+        description="Speaks each AI answer when it's ready. You can always tap “Read aloud” on any answer or the notes."
+        value={settings.readAnswersAloud}
+        onChange={(v) => settings.update({ readAnswersAloud: v })}
+      />
+      <ToggleRow
+        label="Pause the mic while speaking"
+        description="Stops the app transcribing its own voice. Turn off if you use earphones, so nothing in the meeting is missed."
+        value={settings.pauseMicWhileSpeaking}
+        onChange={(v) => settings.update({ pauseMicWhileSpeaking: v })}
+      />
+
+      <View className="border-b border-zinc-800 px-4 py-3">
+        <Text className="mb-2 text-sm text-zinc-400">Speed</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {RATES.map((r) => (
+            <Chip
+              key={r.label}
+              label={r.label}
+              active={settings.ttsRate === r.value}
+              onPress={() => settings.update({ ttsRate: r.value })}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View className="px-4 py-3">
+        <View className="mb-2 flex-row items-center justify-between">
+          <Text className="text-sm text-zinc-400">Voice ({settings.language.split("-")[0]})</Text>
+          <Pressable onPress={load} hitSlop={8}>
+            <Ionicons name="refresh" size={16} color="#a1a1aa" />
+          </Pressable>
+        </View>
+        {voices === null ? (
+          <ActivityIndicator className="self-start" color="#818cf8" />
+        ) : (
+          <View className="flex-row flex-wrap gap-2">
+            <Chip
+              label="System default"
+              active={!settings.ttsVoice}
+              onPress={() => settings.update({ ttsVoice: undefined })}
+            />
+            {shown!.map((v) => (
+              <Chip
+                key={v.id}
+                label={`${v.name}${v.enhanced ? " ★" : ""} · ${v.language}`}
+                active={settings.ttsVoice === v.id}
+                onPress={() => settings.update({ ttsVoice: v.id })}
+              />
+            ))}
+            {voices.length > MAX_VOICES_SHOWN && !showAll ? (
+              <Chip label={`+${voices.length - MAX_VOICES_SHOWN} more`} onPress={() => setShowAll(true)} />
+            ) : null}
+          </View>
+        )}
+        <Text className="mt-2 text-xs leading-5 text-zinc-500">
+          ★ = higher-quality voice.{" "}
+          {Platform.OS === "ios"
+            ? "Download free Enhanced and Premium voices in iOS Settings → Accessibility → Spoken Content → Voices, then tap refresh."
+            : "Install more voices in Android Settings → Accessibility → Text-to-speech output."}
+        </Text>
+        <Button
+          title={testing ? "Stop" : "Test voice"}
+          icon={testing ? "stop-circle" : "play"}
+          variant={testing ? "danger" : "secondary"}
+          onPress={test}
+          className="mt-3"
+        />
+      </View>
+    </Section>
+  );
+}
 
 export default function SettingsScreen() {
   const providers = useProviders((s) => s.providers);
@@ -120,6 +230,8 @@ export default function SettingsScreen() {
           onChange={(v) => settings.update({ onDeviceOnly: v })}
         />
       </Section>
+
+      <VoiceSettings />
 
       <Text className="px-1 text-xs leading-5 text-zinc-500">
         API keys are stored in the device keychain and sent only to the provider you choose. Transcripts and notes are

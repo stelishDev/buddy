@@ -9,19 +9,28 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-export function MicButton({ listening, onPress }: { listening: boolean; onPress: () => void }) {
+export function MicButton({
+  listening,
+  paused = false,
+  onPress,
+}: {
+  listening: boolean;
+  paused?: boolean;
+  onPress: () => void;
+}) {
   const pulse = useSharedValue(0);
+  const hearing = listening && !paused;
 
   useEffect(() => {
-    if (listening) pulse.value = withRepeat(withTiming(1, { duration: 1200 }), -1, false);
+    if (hearing) pulse.value = withRepeat(withTiming(1, { duration: 1200 }), -1, false);
     else {
       cancelAnimation(pulse);
       pulse.value = 0;
     }
-  }, [listening, pulse]);
+  }, [hearing, pulse]);
 
   const ring = useAnimatedStyle(() => ({
-    opacity: listening ? 0.5 * (1 - pulse.value) : 0,
+    opacity: hearing ? 0.5 * (1 - pulse.value) : 0,
     transform: [{ scale: 1 + pulse.value * 0.6 }],
   }));
 
@@ -30,14 +39,18 @@ export function MicButton({ listening, onPress }: { listening: boolean; onPress:
       <View className="h-12 w-12 items-center justify-center">
         <Animated.View style={ring} className="absolute h-12 w-12 rounded-full bg-red-500" />
         <View
-          className={`h-12 w-12 items-center justify-center rounded-full ${listening ? "bg-red-500" : "bg-zinc-800 border border-zinc-700"}`}
+          className={`h-12 w-12 items-center justify-center rounded-full ${hearing ? "bg-red-500" : listening ? "bg-amber-600" : "bg-zinc-800 border border-zinc-700"}`}
         >
           <Ionicons name={listening ? "stop" : "mic"} size={22} color="#fff" />
         </View>
       </View>
       <View>
-        <Text className="text-sm font-semibold text-zinc-100">{listening ? "Listening" : "Mic off"}</Text>
-        <Text className="text-xs text-zinc-500">{listening ? "Tap to stop" : "Tap to start listening"}</Text>
+        <Text className="text-sm font-semibold text-zinc-100">
+          {listening ? (paused ? "Paused" : "Listening") : "Mic off"}
+        </Text>
+        <Text className="text-xs text-zinc-500">
+          {listening ? (paused ? "While reading aloud" : "Tap to stop") : "Tap to start listening"}
+        </Text>
       </View>
     </Pressable>
   );

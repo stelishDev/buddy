@@ -5,6 +5,8 @@ import { Platform } from "react-native";
 
 const KEEP_AWAKE_TAG = "meeting-listener";
 const RESTART_DELAY_MS = 250;
+/** Wait a moment after the app stops talking so the tail of its voice isn't transcribed. */
+const RESUME_DELAY_MS = 400;
 const MAX_CONSECUTIVE_ERRORS = 5;
 const IGNORABLE_ERRORS = new Set(["no-speech", "speech-timeout", "aborted"]);
 
@@ -28,8 +30,12 @@ export function useMeetingListener({ lang, onDeviceOnly, onFinal }: Options) {
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
   const [error, setError] = useState<string | null>(null);
+  /** Temporarily suspended (e.g. while the app is speaking) but still "on". */
+  const [paused, setPaused] = useState(false);
 
   const wantRef = useRef(false);
+  const suspendedRef = useRef(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const interimRef = useRef("");
   const errorCountRef = useRef(0);
   const restartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,7 +68,7 @@ export function useMeetingListener({ lang, onDeviceOnly, onFinal }: Options) {
   const scheduleRestart = (delay = RESTART_DELAY_MS) => {
     if (restartTimer.current) clearTimeout(restartTimer.current);
     restartTimer.current = setTimeout(() => {
-      if (wantRef.current) startEngine();
+      if (wantRef.current && !suspendedRef.current) startEngine();
     }, delay);
   };
 
@@ -85,8 +91,9 @@ export function useMeetingListener({ lang, onDeviceOnly, onFinal }: Options) {
 
   useSpeechRecognitionEvent("end", () => {
     commitInterim();
-    if (wantRef.current) scheduleRestart();
-    else setListening(false);
+    if (wantRef.current) {
+      if (!suspendedRef.current) scheduleRestart();
+    } else setListening(false);
   });
 
   useSpeechRecognitionEvent("error", (event) => {
@@ -127,11 +134,38 @@ export function useMeetingListener({ lang, onDeviceOnly, onFinal }: Options) {
   }, [startEngine]);
 
   const stop = useCallback(() => {
+    const wasSuspended = suspendedRef.current;
     wantRef.current = false;
+    suspendedRef.current = false;
+    setPaused(false);
     if (restartTimer.current) clearTimeout(restartTimer.current);
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
     ExpoSpeechRecognitionModule.stop();
+    // A suspended engine is already stopped, so no "end" event will arrive.
+    if (wasSuspended) setListening(false);
     deactivateKeepAwake(KEEP_AWAKE_TAG);
   }, []);
+
+  /** Suspend recognition without turning the mic "off" (no-op if not listening). */
+  const pause = useCallback(() => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    if (!wantRef.current || suspendedRef.current) return;
+    suspendedRef.current = true;
+    setPaused(true);
+    if (restartTimer.current) clearTimeout(restartTimer.current);
+    ExpoSpeechRecognitionModule.stop(); // flushes what was said so far as a final result
+  }, []);
+
+  /** Undo `pause()` after a short delay (no-op if not paused). */
+  const resume = useCallback(() => {
+    if (!suspendedRef.current) return;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => {
+      suspendedRef.current = false;
+      setPaused(false);
+      if (wantRef.current) startEngine();
+    }, RESUME_DELAY_MS);
+  }, [startEngine]);
 
   // Stop the mic if the screen unmounts while listening.
   useEffect(
@@ -139,6 +173,7 @@ export function useMeetingListener({ lang, onDeviceOnly, onFinal }: Options) {
       if (wantRef.current) {
         wantRef.current = false;
         if (restartTimer.current) clearTimeout(restartTimer.current);
+        if (resumeTimer.current) clearTimeout(resumeTimer.current);
         ExpoSpeechRecognitionModule.abort();
         deactivateKeepAwake(KEEP_AWAKE_TAG);
       }
@@ -146,5 +181,5 @@ export function useMeetingListener({ lang, onDeviceOnly, onFinal }: Options) {
     [],
   );
 
-  return { listening, interim, error, start, stop };
+  return { listening, paused, interim, error, start, stop, pause, resume };
 }
