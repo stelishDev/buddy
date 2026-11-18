@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Meeting Copilot",
+    "slug": "meeting-copilot",
+    "scheme": "meetingcopilot",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#09090b",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.meetingcopilot"
+    },
+    "android": {
+      "package": "com.example.meetingcopilot",
+      "permissions": ["android.permission.RECORD_AUDIO"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Meeting Copilot listens to your meeting so it can transcribe it and take notes.",
+          "speechRecognitionPermission": "Meeting Copilot converts meeting audio to text so it can take notes and answer questions.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
