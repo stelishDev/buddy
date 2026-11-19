@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "Meeting Copilot",
-    "slug": "meeting-copilot",
-    "scheme": "meetingcopilot",
+    "name": "MeMate",
+    "slug": "memate",
+    "scheme": "memate",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#09090b",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.meetingcopilot"
+      "bundleIdentifier": "com.talspot.memate"
     },
     "android": {
-      "package": "com.example.meetingcopilot",
+      "package": "com.talspot.memate",
       "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
@@ -25,8 +25,8 @@
       [
         "expo-speech-recognition",
         {
-          "microphonePermission": "Meeting Copilot listens to your meeting so it can transcribe it and take notes.",
-          "speechRecognitionPermission": "Meeting Copilot converts meeting audio to text so it can take notes and answer questions.",
+          "microphonePermission": "MeMate listens to your meeting so it can transcribe it and take notes.",
+          "speechRecognitionPermission": "MeMate converts meeting audio to text so it can take notes and answer questions.",
           "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
         }
       ]
