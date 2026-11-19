@@ -1,4 +1,4 @@
-# Meeting Copilot
+# MeMate
 
 A React Native app that listens to a meeting, transcribes it live, keeps running notes, and answers questions with the user's own AI account.
 
@@ -9,7 +9,7 @@ A React Native app that listens to a meeting, transcribes it live, keeps running
 - **Live transcription.** The mic uses the phone's built-in speech recogniser (iOS `SFSpeechRecognizer`, Android `SpeechRecognizer`). It restarts itself automatically so it can run for a whole meeting, and the screen stays awake while it listens.
 - **Running notes.** While the mic is on, the notes are rewritten every 30 s to 5 min into Summary, Key points, Decisions, Action items and Open questions. You can share them from the Notes tab.
 - **Ask anything.** Type a question at any time. Answers stream in, based on the transcript and notes.
-- **Auto-answer (optional).** When someone asks a question out loud, Copilot suggests an answer in the Ask tab. It waits 20 seconds before doing this again.
+- **Auto-answer (optional).** When someone asks a question out loud, MeMate suggests an answer in the Ask tab. It waits 20 seconds before doing this again.
 - **Read aloud.** Answers and notes can be spoken with the phone's own voices (`expo-speech`), which are free, offline and add nothing to the app's size. Tap "Read aloud" on any answer, or turn on auto-read in Settings. The mic pauses while the app talks so it doesn't transcribe itself. If you use earphones, you can turn that off. Pick a voice and speed under Settings → Read aloud. On iOS, free Enhanced and Premium voices can be downloaded in Settings → Accessibility → Spoken Content.
 - **Any AI account.** OpenAI, Anthropic (Claude), Google Gemini, and any OpenAI-compatible endpoint: OpenRouter, Groq, Mistral, DeepSeek, xAI, Ollama, LM Studio and more. You can add several accounts and switch between them. "Load models" fetches the account's actual model list, and "Test connection" checks that the key works.
 - **Private by default.** API keys are stored in the Keychain or Keystore. Transcripts are stored on the device. Calls go straight from the phone to your chosen provider, with no backend in between.
@@ -38,7 +38,7 @@ Next, open **Settings → Add** in the app. Pick a provider, paste a key, tap **
 - `production`: a store build with an auto-incremented version
 
 **One-time setup (on your computer):**
-1. Change `ios.bundleIdentifier` and `android.package` in `app.json` from `com.example.meetingcopilot` to your own ID. The Android signing key is tied to this ID, so change it before the first build.
+1. The app ID (`ios.bundleIdentifier` / `android.package` in `app.json`) is `com.talspot.memate`. If you want a different ID, change it before the first build, because the Android signing key is tied to it.
 2. Run `npm install && npx expo install --fix`.
 3. Run `npx eas-cli@latest init`. This creates the Expo project and adds `extra.eas.projectId` to `app.json`.
 4. Commit `app.json`, `package.json` and `package-lock.json`.

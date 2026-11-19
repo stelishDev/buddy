@@ -51,7 +51,7 @@ function headersFor(p: ProviderConfig, apiKey: string | null): Record<string, st
       break;
     default:
       if (apiKey) h["Authorization"] = `Bearer ${apiKey}`;
-      if (baseUrlFor(p).includes("openrouter.ai")) h["X-Title"] = "Meeting Copilot";
+      if (baseUrlFor(p).includes("openrouter.ai")) h["X-Title"] = "MeMate";
   }
   return h;
 }

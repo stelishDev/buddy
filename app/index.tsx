@@ -63,7 +63,7 @@ export default function Home() {
           <EmptyState
             icon="chatbubbles-outline"
             title="No meetings yet"
-            body="Start a session, turn on the mic, and Copilot will transcribe, take notes and answer questions."
+            body="Start a session, turn on the mic, and MeMate will transcribe, take notes and answer questions."
           />
         }
         renderItem={({ item }) => (
