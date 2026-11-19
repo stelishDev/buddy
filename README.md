@@ -30,6 +30,25 @@ Next, open **Settings → Add** in the app. Pick a provider, paste a key, tap **
 
 > For **Ollama or LM Studio** on your computer, use its LAN IP (e.g. `http://192.168.1.10:11434/v1`), not `localhost`. Plain `http` on iOS also needs an App Transport Security exception.
 
+## Building with EAS
+
+`eas.json` has three profiles:
+- `development`: a dev client, installed as an APK
+- `preview`: an installable APK for testing
+- `production`: a store build with an auto-incremented version
+
+**One-time setup (on your computer):**
+1. Change `ios.bundleIdentifier` and `android.package` in `app.json` from `com.example.meetingcopilot` to your own ID. The Android signing key is tied to this ID, so change it before the first build.
+2. Run `npm install && npx expo install --fix`.
+3. Run `npx eas-cli@latest init`. This creates the Expo project and adds `extra.eas.projectId` to `app.json`.
+4. Commit `app.json`, `package.json` and `package-lock.json`.
+5. Create a token at expo.dev → Account settings → Access tokens. Add it on GitHub under the repo's Settings → Secrets and variables → Actions as **`EXPO_TOKEN`**.
+6. **iOS only:** run `npx eas-cli@latest credentials -p ios` once, so Apple certificates exist before building from CI. Android generates its keystore automatically on the first build.
+
+**Start a build:** open GitHub → Actions → **EAS Build** → **Run workflow**, then pick the platform and profile. This also works in the GitHub mobile app. When the build finishes, the install link and QR code are at expo.dev → your project → Builds.
+
+To build locally instead, run `npx eas-cli@latest build -p android --profile preview`.
+
 ## Project layout
 
 ```
