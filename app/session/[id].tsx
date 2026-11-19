@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui";
 import { useAssistant } from "@/hooks/useAssistant";
 import { useMeetingListener } from "@/hooks/useMeetingListener";
 import { isLikelyQuestion } from "@/lib/prompts";
+import { speak, stopSpeaking, useSpeakingId } from "@/lib/tts";
 import { useSessions } from "@/store/sessions";
 import { useSettings } from "@/store/settings";
 
@@ -32,6 +33,20 @@ export default function SessionScreen() {
   const lastAutoAnswer = useRef(0);
   const tabRef = useRef(tab);
   tabRef.current = tab;
+  const speakingId = useSpeakingId();
+
+  const speakOptions = () => {
+    const s = useSettings.getState();
+    return { voice: s.ttsVoice, rate: s.ttsRate, language: s.language };
+  };
+  const toggleSpeak = (itemId: string, text: string) =>
+    speakingId === itemId ? stopSpeaking() : speak(itemId, text, speakOptions());
+
+  /** Ask the AI, then read the answer aloud if that setting is on. */
+  const askAndRead = async (q: string, source: "typed" | "auto") => {
+    const answer = await assistant.ask(q, source);
+    if (answer && useSettings.getState().readAnswersAloud) speak(answer.id, answer.text, speakOptions());
+  };
 
   const listener = useMeetingListener({
     lang: settings.language,
@@ -45,7 +60,7 @@ export default function SessionScreen() {
         now - lastAutoAnswer.current > AUTO_ANSWER_COOLDOWN_MS
       ) {
         lastAutoAnswer.current = now;
-        assistant.ask(text, "auto");
+        askAndRead(text, "auto");
         if (tabRef.current !== "ask") setUnseenAnswers((n) => n + 1);
       }
     },
@@ -59,6 +74,16 @@ export default function SessionScreen() {
     const timer = setInterval(() => refreshRef.current(false), settings.notesIntervalSec * 1000);
     return () => clearInterval(timer);
   }, [listener.listening, settings.autoNotes, settings.notesIntervalSec]);
+
+  // Don't transcribe our own voice: pause the mic while reading aloud.
+  const { pause: pauseMic, resume: resumeMic } = listener;
+  useEffect(() => {
+    if (speakingId && settings.pauseMicWhileSpeaking) pauseMic();
+    else resumeMic();
+  }, [speakingId, settings.pauseMicWhileSpeaking, listener.listening, pauseMic, resumeMic]);
+
+  // Stop talking when leaving the meeting.
+  useEffect(() => () => void stopSpeaking(), []);
 
   const toggleMic = () => {
     if (listener.listening) {
@@ -77,7 +102,7 @@ export default function SessionScreen() {
 
   const askTyped = (q: string) => {
     changeTab("ask");
-    assistant.ask(q, "typed");
+    askAndRead(q, "typed");
   };
 
   if (!session) return <EmptyState icon="alert-circle-outline" title="Meeting not found" />;
@@ -99,7 +124,7 @@ export default function SessionScreen() {
             placeholderTextColor="#52525b"
           />
           <View className="flex-row items-center justify-between">
-            <MicButton listening={listener.listening} onPress={toggleMic} />
+            <MicButton listening={listener.listening} paused={listener.paused} onPress={toggleMic} />
             {assistant.provider ? (
               <Link href="/settings" asChild>
                 <Pressable className="max-w-[45%] flex-row items-center gap-1 rounded-full border border-zinc-800 px-3 py-1.5">
@@ -149,10 +174,18 @@ export default function SessionScreen() {
               error={assistant.notesError}
               updatedAt={session.notesUpdatedAt}
               hasTranscript={session.segments.length > 0}
+              speaking={speakingId === "notes"}
               onRefresh={() => assistant.refreshNotes(true)}
+              onToggleSpeak={() => toggleSpeak("notes", session.notes)}
             />
           ) : (
-            <ChatView messages={session.messages} streaming={assistant.streaming} onSuggestion={askTyped} />
+            <ChatView
+              messages={session.messages}
+              streaming={assistant.streaming}
+              speakingId={speakingId}
+              onSuggestion={askTyped}
+              onToggleSpeak={toggleSpeak}
+            />
           )}
         </View>
 

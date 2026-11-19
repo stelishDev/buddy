@@ -32,10 +32,13 @@ export function useAssistant(sessionId: string) {
   const getSession = () => useSessions.getState().sessions.find((s) => s.id === sessionId);
 
   const ask = useCallback(
-    async (question: string, source: "typed" | "auto" = "typed") => {
+    async (
+      question: string,
+      source: "typed" | "auto" = "typed",
+    ): Promise<{ id: string; text: string } | null> => {
       const store = useSessions.getState();
       const session = getSession();
-      if (!session || !question.trim()) return;
+      if (!session || !question.trim()) return null;
 
       const history = session.messages.filter((m) => !m.pending && !m.error).slice(-HISTORY_LIMIT);
       const userMsg: QAMessage = { id: uid(), role: "user", content: question.trim(), source, at: Date.now() };
@@ -49,7 +52,7 @@ export function useAssistant(sessionId: string) {
           error: true,
           content: "No AI account set up yet. Add one in Settings.",
         });
-        return;
+        return null;
       }
 
       let acc = "";
@@ -63,13 +66,16 @@ export function useAssistant(sessionId: string) {
             setStreaming((s) => ({ ...s, [replyId]: acc }));
           },
         });
-        store.updateMessage(sessionId, replyId, { content: full || acc || "(no reply)", pending: false });
+        const text = full || acc;
+        store.updateMessage(sessionId, replyId, { content: text || "(no reply)", pending: false });
+        return text ? { id: replyId, text } : null;
       } catch (e: any) {
         store.updateMessage(sessionId, replyId, {
           content: acc ? `${acc}\n\n⚠️ ${e?.message ?? e}` : String(e?.message ?? e),
           pending: false,
           error: !acc,
         });
+        return null;
       } finally {
         setStreaming(({ [replyId]: _, ...rest }) => rest);
       }

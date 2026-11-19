@@ -12,6 +12,13 @@ export interface AssistantSettings {
   language: string;
   /** Keep audio on the device (if the OS supports on-device recognition). */
   onDeviceOnly: boolean;
+  /** Read each AI answer aloud when it finishes. */
+  readAnswersAloud: boolean;
+  /** Voice identifier; undefined = system default for `language`. */
+  ttsVoice?: string;
+  ttsRate: number;
+  /** Stop transcribing while the app is talking, so it doesn't hear itself. */
+  pauseMicWhileSpeaking: boolean;
 }
 
 interface SettingsState extends AssistantSettings {
@@ -26,6 +33,10 @@ export const useSettings = create<SettingsState>()(
       autoAnswer: false,
       language: "en-NZ",
       onDeviceOnly: false,
+      readAnswersAloud: false,
+      ttsVoice: undefined,
+      ttsRate: 1,
+      pauseMicWhileSpeaking: true,
       update: (patch) => set(patch),
     }),
     {
