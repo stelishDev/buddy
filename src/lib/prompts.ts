@@ -20,7 +20,7 @@ export function formatTranscript(segments: Segment[], startedAt: number, maxChar
 }
 
 export function assistantSystem(transcript: string, notes: string): string {
-  return `You are Meeting Copilot, a discreet real-time assistant helping the user during a live meeting.
+  return `You are Eaves, a discreet real-time assistant helping the user during a live meeting.
 The user may glance at your answer mid-conversation, so:
 - Lead with the answer. No preamble, no restating the question.
 - Keep it short: a sentence or a few tight bullet points unless asked for more.
