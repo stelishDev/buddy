@@ -1,14 +1,14 @@
 import { Column, Spacer, Text } from "@expo/ui/jetpack-compose";
 import { background, cornerRadius, fillMaxSize, fillMaxWidth, height, paddingAll } from "@expo/ui/jetpack-compose/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
-import type { MeMateWidgetProps } from "./types";
+import type { EavesWidgetProps } from "./types";
 
 /**
  * Android home screen widget (Jetpack Compose via Expo UI).
  * Runs in an isolated runtime: no hooks, no app state, no module-scope values —
  * everything it needs comes in through props. Updated from the app by src/widgets/sync.ts.
  */
-const MeMateWidget = (props: MeMateWidgetProps, environment: WidgetEnvironment) => {
+const EavesWidget = (props: EavesWidgetProps, environment: WidgetEnvironment) => {
   "widget";
   const size = (environment as { widgetSize?: { width: number; height: number } }).widgetSize;
   const tall = (size?.height ?? 110) >= 180;
@@ -17,7 +17,7 @@ const MeMateWidget = (props: MeMateWidgetProps, environment: WidgetEnvironment) 
   return (
     <Column modifiers={[fillMaxSize(), background("#18181b"), cornerRadius(20), paddingAll(14)]}>
       <Text color="#a5b4fc" style={{ fontSize: 12, fontWeight: "bold" }}>
-        {props.openActions > 0 ? `MeMate · ${props.openActions} to do` : "MeMate"}
+        {props.openActions > 0 ? `Eaves · ${props.openActions} to do` : "Eaves"}
       </Text>
       <Spacer modifiers={[height(4)]} />
       <Text
@@ -52,10 +52,10 @@ const MeMateWidget = (props: MeMateWidgetProps, environment: WidgetEnvironment) 
 };
 
 // Keep in sync with EMPTY_WIDGET_PROPS in ./types (inlined so this file imports only types).
-export default createWidget("MeMateWidget", MeMateWidget, {
+export default createWidget("EavesWidget", EavesWidget, {
   hasMeeting: false,
   title: "No meetings yet",
-  summary: "Open MeMate and start a session to see notes and action items here.",
+  summary: "Open Eaves and start a session to see notes and action items here.",
   actions: [],
   openActions: 0,
   updatedLabel: "",

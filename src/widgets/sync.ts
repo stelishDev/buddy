@@ -1,6 +1,6 @@
 import { useSessions, type Session } from "@/store/sessions";
-import MeMateWidget from "./MeMateWidget";
-import { EMPTY_WIDGET_PROPS, type MeMateWidgetProps } from "./types";
+import EavesWidget from "./EavesWidget";
+import { EMPTY_WIDGET_PROPS, type EavesWidgetProps } from "./types";
 
 const DEBOUNCE_MS = 1500;
 const MAX_ACTIONS = 5;
@@ -31,7 +31,7 @@ function updatedLabel(at: number): string {
   return sameDay ? `Updated ${time}` : `Updated ${d.toLocaleDateString([], { day: "numeric", month: "short" })}, ${time}`;
 }
 
-export function buildWidgetProps(sessions: Session[]): MeMateWidgetProps {
+export function buildWidgetProps(sessions: Session[]): EavesWidgetProps {
   const latest = [...sessions].sort((a, b) => b.updatedAt - a.updatedAt)[0];
   if (!latest) return EMPTY_WIDGET_PROPS;
 
@@ -67,7 +67,7 @@ export function syncWidget(): void {
     const key = JSON.stringify(props);
     if (key === lastSent) return;
     lastSent = key;
-    MeMateWidget.updateSnapshot(props);
+    EavesWidget.updateSnapshot(props);
   } catch (e) {
     // Widgets are a nice-to-have; never let them break the app.
     console.warn("[widget] update failed", e);

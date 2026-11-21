@@ -20,7 +20,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: "#09090b" },
         }}
       >
-        <Stack.Screen name="index" options={{ title: "MeMate" }} />
+        <Stack.Screen name="index" options={{ title: "Eaves" }} />
         <Stack.Screen name="session/[id]" options={{ title: "Meeting" }} />
         <Stack.Screen name="settings/index" options={{ title: "Settings" }} />
         <Stack.Screen name="settings/provider" options={{ title: "AI account", presentation: "modal" }} />

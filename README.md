@@ -1,4 +1,4 @@
-# MeMate
+# Eaves
 
 A React Native app that listens to a meeting, transcribes it live, keeps running notes, and answers questions with the user's own AI account.
 
@@ -9,9 +9,9 @@ A React Native app that listens to a meeting, transcribes it live, keeps running
 - **Live transcription.** The mic uses the phone's built-in speech recogniser (iOS `SFSpeechRecognizer`, Android `SpeechRecognizer`). It restarts itself automatically so it can run for a whole meeting, and the screen stays awake while it listens.
 - **Running notes.** While the mic is on, the notes are rewritten every 30 s to 5 min into Summary, Key points, Decisions, Action items and Open questions. You can share them from the Notes tab.
 - **Ask anything.** Type a question at any time. Answers stream in, based on the transcript and notes.
-- **Auto-answer (optional).** When someone asks a question out loud, MeMate suggests an answer in the Ask tab. It waits 20 seconds before doing this again.
+- **Auto-answer (optional).** When someone asks a question out loud, Eaves suggests an answer in the Ask tab. It waits 20 seconds before doing this again.
 - **Read aloud.** Answers and notes can be spoken with the phone's own voices (`expo-speech`), which are free, offline and add nothing to the app's size. Tap "Read aloud" on any answer, or turn on auto-read in Settings. The mic pauses while the app talks so it doesn't transcribe itself. If you use earphones, you can turn that off. Pick a voice and speed under Settings → Read aloud. On iOS, free Enhanced and Premium voices can be downloaded in Settings → Accessibility → Spoken Content.
-- **Home screen widget.** Shows your latest meeting's title, its open action items (or the summary if there aren't any) and when it was last updated. It works on Android and on iOS (small, medium and large sizes), and the app keeps it up to date automatically. To add it, long-press the home screen → Widgets → MeMate.
+- **Home screen widget.** Shows your latest meeting's title, its open action items (or the summary if there aren't any) and when it was last updated. It works on Android and on iOS (small, medium and large sizes), and the app keeps it up to date automatically. To add it, long-press the home screen → Widgets → Eaves.
 - **Any AI account.** OpenAI, Anthropic (Claude), Google Gemini, and any OpenAI-compatible endpoint: OpenRouter, Groq, Mistral, DeepSeek, xAI, Ollama, LM Studio and more. You can add several accounts and switch between them. "Load models" fetches the account's actual model list, and "Test connection" checks that the key works.
 - **Private by default.** API keys are stored in the Keychain or Keystore. Transcripts are stored on the device. Calls go straight from the phone to your chosen provider, with no backend in between.
 
@@ -39,7 +39,7 @@ Next, open **Settings → Add** in the app. Pick a provider, paste a key, tap **
 - `production`: a store build with an auto-incremented version
 
 **One-time setup (on your computer):**
-1. The app ID (`ios.bundleIdentifier` / `android.package` in `app.json`) is `com.talspot.memate`. If you want a different ID, change it before the first build, because the Android signing key is tied to it.
+1. The app ID (`ios.bundleIdentifier` / `android.package` in `app.json`) is `com.talspot.eaves`. If you want a different ID, change it before the first build, because the Android signing key is tied to it.
 2. Run `npm install && npx expo install --fix`.
 3. Run `npx eas-cli@latest init`. This creates the Expo project and adds `extra.eas.projectId` to `app.json`.
 4. Commit `app.json`, `package.json` and `package-lock.json`.
@@ -67,8 +67,8 @@ src/
   lib/secureKeys.ts      API key storage (SecureStore)
   lib/tts.ts             Text-to-speech: speak/stop, markdown → speech, voice list
   widgets/               Home screen widget (expo-widgets)
-    MeMateWidget.android.tsx   Jetpack Compose layout (Expo UI)
-    MeMateWidget.ios.tsx       SwiftUI layout (Expo UI)
+    EavesWidget.android.tsx   Jetpack Compose layout (Expo UI)
+    EavesWidget.ios.tsx       SwiftUI layout (Expo UI)
     sync.ts                    Turns the latest meeting into widget data; updates on change
   hooks/useMeetingListener.ts  Continuous speech recognition with auto-restart
   hooks/useAssistant.ts        Ask + notes refresh with streaming
@@ -86,6 +86,6 @@ Presets in `src/lib/ai/presets.ts` cover most providers. If a new API isn't Open
 - **iOS.** Recognition runs in short utterance-sized sessions that restart straight away, so a word can occasionally be lost at the boundary. Listening stops if the app is backgrounded.
 - **Android.** Continuous mode needs Android 13 or later. Older versions fall back to restart-per-utterance. Some devices beep on each restart.
 - **Better accuracy or speaker labels.** You could swap `useMeetingListener` for chunked recording with `expo-audio` and a cloud speech-to-text API (e.g. OpenAI transcription, Deepgram, AssemblyAI). The rest of the app only needs `onFinal(text)`.
-- **Widget code** runs in a separate, isolated runtime. It can only use Expo UI components, with no hooks, app state or imports, and all its data comes in through props. `babel.config.js` keeps NativeWind's JSX out of these files. On iOS the widget needs an App Group (`group.com.talspot.memate`), which EAS sets up when it creates the iOS credentials.
+- **Widget code** runs in a separate, isolated runtime. It can only use Expo UI components, with no hooks, app state or imports, and all its data comes in through props. `babel.config.js` keeps NativeWind's JSX out of these files. On iOS the widget needs an App Group (`group.com.talspot.eaves`), which EAS sets up when it creates the iOS credentials.
 - **More natural voices.** For neural voices offline, swap `src/lib/tts.ts` to use Kokoro-82M (Apache-2.0) through `react-native-sherpa-onnx`, and download the model on first use (roughly 100–300 MB). Before shipping Piper voices commercially, check their licences: the engine is now GPL-3.0, and many voices are licensed for non-commercial use only.
 - **NativeWind v5.** v5 (Tailwind 4) is still a release candidate. This project uses stable v4. When v5 goes stable, follow the official v4 → v5 migration guide. The class names stay the same.

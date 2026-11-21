@@ -1,7 +1,7 @@
 import { HStack, Image, Text, VStack } from "@expo/ui/swift-ui";
 import { containerBackground, font, foregroundStyle, lineLimit, padding } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
-import type { MeMateWidgetProps } from "./types";
+import type { EavesWidgetProps } from "./types";
 
 /**
  * iOS home screen widget (SwiftUI via Expo UI). Small, medium and large sizes.
@@ -9,7 +9,7 @@ import type { MeMateWidgetProps } from "./types";
  * everything it needs comes in through props. Updated from the app by src/widgets/sync.ts.
  * Tapping a widget on iOS opens the app.
  */
-const MeMateWidget = (props: MeMateWidgetProps, environment: WidgetEnvironment) => {
+const EavesWidget = (props: EavesWidgetProps, environment: WidgetEnvironment) => {
   "widget";
   const family = environment.widgetFamily;
   const small = family === "systemSmall";
@@ -25,7 +25,7 @@ const MeMateWidget = (props: MeMateWidgetProps, environment: WidgetEnvironment) 
       <HStack spacing={4}>
         <Image systemName="waveform" color="#818cf8" />
         <Text modifiers={[font({ size: 12, weight: "semibold" }), foregroundStyle("#a5b4fc")]}>
-          {props.openActions > 0 ? `MeMate · ${props.openActions} to do` : "MeMate"}
+          {props.openActions > 0 ? `Eaves · ${props.openActions} to do` : "Eaves"}
         </Text>
       </HStack>
 
@@ -53,10 +53,10 @@ const MeMateWidget = (props: MeMateWidgetProps, environment: WidgetEnvironment) 
 };
 
 // Keep in sync with EMPTY_WIDGET_PROPS in ./types (inlined so this file imports only types).
-export default createWidget("MeMateWidget", MeMateWidget, {
+export default createWidget("EavesWidget", EavesWidget, {
   hasMeeting: false,
   title: "No meetings yet",
-  summary: "Open MeMate and start a session to see notes and action items here.",
+  summary: "Open Eaves and start a session to see notes and action items here.",
   actions: [],
   openActions: 0,
   updatedLabel: "",
