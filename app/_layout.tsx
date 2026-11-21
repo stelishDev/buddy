@@ -1,8 +1,13 @@
 import "../global.css";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { startWidgetSync } from "@/widgets/sync";
 
 export default function RootLayout() {
+  // Keep the home screen widget showing the latest meeting.
+  useEffect(() => startWidgetSync(), []);
+
   return (
     <>
       <StatusBar style="light" />

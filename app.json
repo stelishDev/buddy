@@ -29,6 +29,31 @@
           "speechRecognitionPermission": "MeMate converts meeting audio to text so it can take notes and answer questions.",
           "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
         }
+      ],
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "widgets": [
+            {
+              "name": "MeMateWidget",
+              "displayName": "MeMate",
+              "description": "Your latest meeting's summary and open action items.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"],
+                "initialLayout": "src/widgets/MeMateWidget.ios.tsx"
+              },
+              "android": {
+                "minWidth": 250,
+                "minHeight": 110,
+                "targetCellWidth": 4,
+                "targetCellHeight": 2,
+                "resizeMode": "both",
+                "initialLayout": "src/widgets/MeMateWidget.android.tsx"
+              }
+            }
+          ]
+        }
       ]
     ],
     "experiments": {
