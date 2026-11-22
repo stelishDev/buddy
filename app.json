@@ -1,26 +1,23 @@
 {
   "expo": {
-    "name": "Meeting Copilot",
-    "slug": "buddy",
-    "scheme": "meetingcopilot",
+    "name": "Eaves",
+    "slug": "eaves",
+    "scheme": "eaves",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#09090b",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.meetingcopilot",
+      "bundleIdentifier": "com.talspot.eaves",
       "infoPlist": {
-        "NSSpeechRecognitionUsageDescription": "Meeting Copilot converts meeting audio to text so it can take notes and answer questions.",
-        "NSMicrophoneUsageDescription": "Meeting Copilot listens to your meeting so it can transcribe it and take notes."
+        "NSSpeechRecognitionUsageDescription": "Eaves converts meeting audio to text so it can take notes and answer questions.",
+        "NSMicrophoneUsageDescription": "Eaves listens to your meeting so it can transcribe it and take notes."
       }
     },
     "android": {
-      "package": "com.example.meetingcopilot",
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.RECORD_AUDIO"
-      ]
+      "package": "com.talspot.eaves",
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "bundler": "metro",
@@ -32,10 +29,33 @@
       [
         "expo-speech-recognition",
         {
-          "microphonePermission": "Meeting Copilot listens to your meeting so it can transcribe it and take notes.",
-          "speechRecognitionPermission": "Meeting Copilot converts meeting audio to text so it can take notes and answer questions.",
-          "androidSpeechServicePackages": [
-            "com.google.android.googlequicksearchbox"
+          "microphonePermission": "Eaves listens to your meeting so it can transcribe it and take notes.",
+          "speechRecognitionPermission": "Eaves converts meeting audio to text so it can take notes and answer questions.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+        }
+      ],
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "widgets": [
+            {
+              "name": "EavesWidget",
+              "displayName": "Eaves",
+              "description": "Your latest meeting's summary and open action items.",
+              "ios": {
+                "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"],
+                "initialLayout": "src/widgets/EavesWidget.ios.tsx"
+              },
+              "android": {
+                "minWidth": 250,
+                "minHeight": 110,
+                "targetCellWidth": 4,
+                "targetCellHeight": 2,
+                "resizeMode": "both",
+                "initialLayout": "src/widgets/EavesWidget.android.tsx"
+              }
+            }
           ]
         }
       ]
