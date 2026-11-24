@@ -8,8 +8,8 @@ on:
       platform:
         description: Platform to build
         type: choice
-        options: [all, ios, android]
-        default: all
+        options: [android, ios, all]
+        default: android
 
 concurrency:
   group: eas-preview-${{ github.ref }}
@@ -36,4 +36,4 @@ jobs:
       # --no-wait queues the build on EAS and returns immediately, so the
       # workflow doesn't burn GitHub minutes while the build runs.
       - name: Trigger EAS build
-        run: eas build --profile preview --platform ${{ inputs.platform || 'all' }} --non-interactive --no-wait
+        run: eas build --profile preview --platform ${{ inputs.platform || 'android' }} --non-interactive --no-wait
