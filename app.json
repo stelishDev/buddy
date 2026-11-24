@@ -70,7 +70,7 @@
         }
       },
       "eas": {
-        "projectId": "b28460b5-e20a-4c97-bd47-25192eb9c72d"
+        "projectId": "df287d46-42f9-45fb-9ed6-a747bd1e9480"
       }
     },
     "owner": "stelish",
@@ -78,7 +78,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/b28460b5-e20a-4c97-bd47-25192eb9c72d"
+      "url": "https://u.expo.dev/df287d46-42f9-45fb-9ed6-a747bd1e9480"
     }
   }
 }
